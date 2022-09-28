@@ -73,7 +73,7 @@ def kill():
         if sEnemyid in ['20001','20002','20003']:
 
             if (int(msEquipmentid)-int(sEnemyid)+10000)>0:
-                return 'You are win Level 1!'
+                return 'You win Level 1!'
             elif (int(msEquipmentid)-int(sEnemyid)+10000)==0:
                 return 'Your and your enemy all dead!!!'
             else:
