@@ -15,6 +15,7 @@ from beaker.middleware import SessionMiddleware
 import json
 
 import pip
+from SQLiteHelper import SQLiteHelper
 app = Bottle()
 msUsername = ''
 msEquipmentid=''
@@ -48,7 +49,18 @@ def login():
         msUsername = data.get('username')
         sPassword = data.get('password')
 
-        if msUsername == sPassword:
+        # 使用 SQLiteHelper 连接到数据库
+        db_helper = SQLiteHelper('bat.db')
+
+        # 查询用户信息
+        sql = f"SELECT * FROM users WHERE username='{msUsername}' AND password='{sPassword}'"
+        user = db_helper.select_one(sql)
+
+        # 查询装备信息
+        equipment_data = db_helper.select_more("SELECT * FROM equipment")
+        equipment_options = {str(row['id']): row['name'] for row in equipment_data}
+
+        if user:
             ssSession = request.environ.get('beaker.session')
             ssSession['user'] = msUsername
             ssSession.save()
@@ -57,17 +69,19 @@ def login():
                 'code': 0,
                 'message': 'Success',
                 'data': {
-                    'equipment_options': {
-                        '10001': 'Knife',
-                        '10002': 'Big Sword',
-                        '10003': 'KuiHuaBaoDian'
-                    }
+                    'equipment_options': equipment_options  # 从数据库获取装备信息
                 }
+            })
+        else:
+            return json.dumps({
+                'code': 9901,
+                'message': 'Username or Password Error',
+                'data': None
             })
     except:
         return json.dumps({
-            'code': 9901,
-            'message': 'Username or Password Error',
+            'code': 9906,
+            'message': 'Invalid JSON Input',
             'data': None
         })
 
@@ -78,6 +92,16 @@ def selectEq():
         msEquipmentid = data.get('equipmentid')
         ssSession = request.environ.get('beaker.session')
         
+        # 获取会话中存储的用户名
+        stored_username = ssSession.get('user', None)
+
+        # 使用 SQLiteHelper 连接到数据库
+        db_helper = SQLiteHelper('bat.db')
+
+        # 查询敌人信息
+        enemy_data = db_helper.select_more("SELECT * FROM enemy")
+        enemy_options = {str(row['id']): row['name'] for row in enemy_data}
+        
         if msEquipmentid is not None and str(msEquipmentid).isdigit():
             ssSession['equipmentid'] = msEquipmentid
             ssSession.save()
@@ -86,11 +110,8 @@ def selectEq():
                 'message': 'Success',
                 'data': {
                     'equipmentid': msEquipmentid,
-                    'enemy_options': {
-                        '20001': 'Terran',
-                        '20002': 'ORC',
-                        '20003': 'Undead'
-                    }
+                    'enemy_options': enemy_options,  # 从数据库获取敌人信息
+                    'username': stored_username
                 }
             })
         else:
