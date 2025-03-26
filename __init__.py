@@ -110,8 +110,7 @@ def selectEq():
                 'message': 'Success',
                 'data': {
                     'equipmentid': msEquipmentid,
-                    'enemy_options': enemy_options,  # 从数据库获取敌人信息
-                    'username': stored_username
+                    'enemy_options': enemy_options
                 }
             })
         else:
