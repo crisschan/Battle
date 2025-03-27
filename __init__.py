@@ -53,7 +53,7 @@ def login():
         db_helper = SQLiteHelper('bat.db')
 
         # 查询用户信息
-        sql = f"SELECT * FROM users WHERE username='{msUsername}' AND password='{sPassword}'"
+        sql = f"SELECT * FROM user WHERE username='{msUsername}' AND password='{sPassword}'"
         user = db_helper.select_one(sql)
 
         # 查询装备信息
