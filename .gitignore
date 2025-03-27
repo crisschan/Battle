@@ -1,2 +1,5 @@
 
 .vscode/launch.json
+/test_case/allure-results
+/test_case/allure-report
+/test_case/__pycache__
