@@ -103,3 +103,9 @@
 
 响应内容：说明性文本，说明战斗结果
 
+PS：测试部分的命令
+```
+pytest test_api.py -v --alluredir=./allure-results # 执行测试用例
+allure serve ./allure-results           # 查看测试报告
+allure generate ./allure-results -o ./allure-report --clean # 生成测试报告
+```
