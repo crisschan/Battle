@@ -9,6 +9,7 @@
 
 from doctest import BLANKLINE_MARKER
 from gettext import install
+import re
 from bottle import Bottle, run,get,post,request,static_file,redirect
 from bottle import Bottle, run, get, post, request, static_file, redirect
 from beaker.middleware import SessionMiddleware
@@ -25,11 +26,6 @@ session_opts = {
    'session.auto':True               #自动保存session
     }
 
-#
-# 
-# 
-# #
-
 @app.get('/')
 @app.get('/index')
 def index():
@@ -44,7 +40,8 @@ def index():
 @app.post('/login')
 def login():
     try:
-        data = request.json
+        
+        data = dict(request.forms)
         msUsername = data.get('username')
         sPassword = data.get('password')
 
@@ -64,21 +61,22 @@ def login():
                     }
                 }
             })
-    except:
+    except Exception as e:
+        print(e)
         return json.dumps({
             'code': 9901,
             'message': 'Username or Password Error',
             'data': None
         })
 
-@app.post('/select')
+@app.post('/selectEq')
 def selectEq():
     try:
-        data = request.json
+        data = dict(request.forms)
         msEquipmentid = data.get('equipmentid')
         ssSession = request.environ.get('beaker.session')
         
-        if msEquipmentid is not None and str(msEquipmentid).isdigit():
+        if msEquipmentid is not None and msEquipmentid.isdigit():
             ssSession['equipmentid'] = msEquipmentid
             ssSession.save()
             return json.dumps({
@@ -99,7 +97,7 @@ def selectEq():
                 'message': 'Invalid Equipment Selection',
                 'data': None
             })
-    except:
+    except Exception:
         return json.dumps({
             'code': 9906,
             'message': 'Invalid JSON Input',
@@ -109,7 +107,7 @@ def selectEq():
 @app.post('/kill')
 def kill():
     try:
-        data = request.json
+        data = dict(request.forms)
         sEnemyid = data.get('enemyid')
         msEquipmentid = data.get('equipmentid')
         
@@ -155,7 +153,7 @@ def kill():
                 'message': 'Invalid Equipment ID',
                 'data': None
             })
-    except:
+    except Exception:
         return json.dumps({
             'code': 9906,
             'message': 'Invalid JSON Input',
